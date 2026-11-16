@@ -1,51 +1,48 @@
-name: CI - Testes Automatizados de API (ServeRest)
+name: CI - Testes Automatizados (API e Web UI)
 
-# Define QUANDO a esteira roda:
 on:
   push:
     branches: [ main, master ]
   pull_request:
     branches: [ main, master ]
-  workflow_dispatch: # Permite rodar manualmente com um clique no GitHub
+  workflow_dispatch:
 
 jobs:
-  testes-api:
+  testes-regressivos:
     name: Execução de Testes e Qualidade
-    runs-on: ubuntu-latest # Roda em um servidor Linux moderno na nuvem do GitHub
+    runs-on: ubuntu-latest
     timeout-minutes: 10
 
-    # Injeta a variável de ambiente na máquina da nuvem
     env:
       BASE_URL: https://serverest.dev
 
     steps:
-      # 1. Baixa o seu código para o servidor
       - name: 1. Checkout do Repositório
         uses: actions/checkout@v4
 
-      # 2. Prepara o Node.js na versão 20 (LTS)
       - name: 2. Configurar Node.js 20
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: 'npm'
 
-      # 3. Instala as dependências usando o package-lock.json
       - name: 3. Instalar Dependências
         run: npm ci
 
-      # 4. Valida a qualidade do código com o ESLint
       - name: 4. Checagem de Qualidade de Código (ESLint)
         run: npm run lint
 
-      # 5. Executa todos os testes do Playwright
-      - name: 5. Executar Testes Automatizados
+      # --- NOVO PASSO ESSENCIAL PARA A WEB UI ---
+      - name: 5. Instalar Navegador Chromium no Linux
+        run: npx playwright install --with-deps chromium
+
+      # Agora executa tanto os testes de API quanto o teste de Front-end (UI) em modo headless
+      - name: 6. Executar Todos os Testes (API + UI)
         run: npm test
 
-      # 6. Salva o relatório HTML como evidência (mesmo se algum teste falhar)
-      - name: 6. Publicar Relatório de Evidências (Playwright Report)
+      - name: 7. Publicar Relatório de Evidências (Playwright Report)
         uses: actions/upload-artifact@v4
-        if: always() # Garante que o relatório seja gerado mesmo em caso de falha
+        if: always()
         with:
           name: playwright-report
           path: playwright-report/
