@@ -1,0 +1,24 @@
+name: Performance - Testes de Carga (k6)
+
+# Dispara EXCLUSIVAMENTE através do botão manual no site do GitHub
+on:
+  workflow_dispatch:
+
+jobs:
+  teste-performance:
+    name: Execução de Carga com k6
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      # 1. Baixa o código do seu repositório
+      - name: 1. Checkout do Repositório
+        uses: actions/checkout@v4
+
+      # 2. Instala o k6 no Linux usando a Action oficial da Grafana Labs
+      - name: 2. Instalar k6 na Nuvem
+        uses: grafana/setup-k6-action@v1
+
+      # 3. Executa o script de carga do k6
+      - name: 3. Executar Testes de Carga
+        run: k6 run performance/usuarios-performance.js

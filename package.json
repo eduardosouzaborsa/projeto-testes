@@ -3,8 +3,10 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "scripts": {
+    "scripts": {
     "test": "playwright test",
+    "test:ui": "playwright test tests/ui/ --headed",
+    "test:load": "k6 run performance/usuarios-performance.js",
     "test:report": "playwright show-report",
     "format": "prettier --write .",
     "lint": "eslint ."
